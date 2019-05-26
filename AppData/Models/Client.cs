@@ -7,7 +7,19 @@ namespace AppData.Models
    public class Client
     {
         public Client() {
-            id = new int();
+
+            Random random = new Random();
+            id =  random.Next(1000);
+            Sexe = 'F';
+            Etat_Civil = "M";
+            //Carte_Fidelite = true;
+            //Carte_Credit = false;
+
+        }
+        public Client(int id)
+        {
+
+            this.id = id;
         }
 
 

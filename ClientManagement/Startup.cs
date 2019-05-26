@@ -26,6 +26,8 @@ namespace ClientManagement
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
+
+
             });
 
 
@@ -34,6 +36,8 @@ namespace ClientManagement
             services.AddDbContext<ContextClass>(options => options.UseNpgsql(
                 Configuration.GetConnectionString("DefaultConnection")
                 ));
+
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,7 +56,10 @@ namespace ClientManagement
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
+            app.UseCors(
+       options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+    .AllowCredentials()
+   );
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using AppData.Models;
 using System.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClientManagement.Controllers
 {
@@ -16,6 +17,8 @@ namespace ClientManagement.Controllers
         public ClientController(ContextClass context)
         {
             ContextC = context;
+            DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
+            dbContextOptionsBuilder.EnableSensitiveDataLogging();
         }
 
 
@@ -29,17 +32,32 @@ namespace ClientManagement.Controllers
             return Ok(clients);
         }
 
+        //GetClient_by_id
+        [HttpGet("{id}")]
+        public IActionResult GetClient_by_id(int id)
+        {
+            var clients = ContextC.Client.ToList();
+            for (int i = 0; i < clients.Count; i++)
+            {
+                if (clients[i].id == id)
+                {
+                    return Ok(clients[i]);
+
+                }
+            }
+            return NotFound();
+        }
 
 
         //POSTClient
         [HttpPost]
-        public ActionResult CreateCient([FromBody] Client client)
+        public ActionResult CreateClient([FromBody] Client client)
         {
-           try
+            try
             {
                 if (ModelState.IsValid)
                 {
-                    Console.WriteLine("--> client: -",client.Nom," ",client.Prenom,"- is being Added to the Database ");
+                    Console.WriteLine("--> client: -", client.Nom, " ", client.Prenom, "- is being Added to the Database ");
                     ContextC.Add(client);
                     ContextC.SaveChanges();
                 }
@@ -51,6 +69,8 @@ namespace ClientManagement.Controllers
 
             return Ok("Creation Client terminée avec success");
         }
+
+
 
         //UpdateClient
         [HttpPut]
@@ -72,21 +92,89 @@ namespace ClientManagement.Controllers
 
             return Ok("Creation Client terminée avec success");
         }
+
+        //UpdateClient_with_is
+        [HttpPut("{id}")]
+        public ActionResult UpdateCient_with_id(int id, [FromBody] Client client = null)
+        {
+
+
+            var client1 = ContextC.Client.Find(id);
+            if (client1 != null)
+            {
+                ContextC.Entry<Client>(client1).State = EntityState.Detached;
+                try
+                {
+
+                    if (ModelState.IsValid)
+                    {
+                        Console.WriteLine("--> client: -", client.Nom, " ", client.Prenom, "- is being Modified ");
+                        ContextC.Entry<Client>(client).State = EntityState.Detached;
+                        ContextC.Update(client);
+
+
+
+                        ContextC.SaveChanges();
+                    }
+                }
+                catch (DataException /* dex */)
+                {
+                    ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
+                }
+
+            }
+            return Ok("Creation Client terminée avec success");
+        }
+
+
         [HttpDelete]
-        public ActionResult DeleteClient ([FromBody]Client client)
-        { 
-          try
+        public ActionResult DeleteClient([FromBody]Client client)
+        {
+            try
             {
                 Console.WriteLine("--> client: -", client.Nom, " ", client.Prenom, "- is being Deleted ");
                 ContextC.Remove(client);
                 ContextC.SaveChanges();
                 return Ok(" Client Supprimé avec Success ");
 
-            } catch (Exception )
-            { return Ok("An error accured during the deleting operation of the client , please try again in a while "); }
+            }
+            catch ( Exception e)
+            {
+                string errorstring = "An error accured during the deleting operation of the client , please try again in a while " + e.StackTrace.ToString();
+                return Ok(errorstring); }
 
         }
 
-     
+        [HttpDelete("{id}")]
+        public ActionResult DeleteClient_with_id(int id)
+        {
+
+            Client client = new Client(id);
+            var client1 = ContextC.Client.Find(id);
+            if (client1 != null)
+            {
+                ContextC.Entry<Client>(client1).State = EntityState.Detached;
+
+                try
+                {
+                    Console.WriteLine("--> client: -", client.Nom, " ", client.Prenom, "- is being Deleted ");
+                    ContextC.Entry<Client>(client1).State = EntityState.Detached;
+                    ContextC.Remove(client);
+                    ContextC.SaveChanges();
+                    return Ok(" Client Supprimé avec Success ");
+
+                }
+                catch (Exception e)
+
+
+                {
+                    string errorstring = "An error accured during the deleting operation of the client , please try again in a while " + e.StackTrace.ToString();
+                    return Ok(errorstring);
+                }
+                
+                
+            }
+            return Ok("The Client is not found ");
+        }
     }
 }

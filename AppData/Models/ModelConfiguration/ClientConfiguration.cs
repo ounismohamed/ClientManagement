@@ -24,7 +24,7 @@ namespace AppData.Models.ModelConfiguration
               .IsRequired();
 
             builder.Property(prop => prop.Sexe)
-              .IsRequired();
+              ;
 
             builder.Property(prop => prop.Adresse)
              .HasMaxLength(50)
@@ -37,13 +37,13 @@ namespace AppData.Models.ModelConfiguration
 
             builder.Property(prop => prop.Etat_Civil)
               .HasMaxLength(10)
-              .IsRequired();
+              ;
 
             builder.Property(prop => prop.Carte_Credit)
-              .IsRequired();
+              ;
 
             builder.Property(prop => prop.Carte_Fidelite)
-              .IsRequired();
+              ;
 
             builder.Property(prop => prop.Age)
               .IsRequired();
