@@ -67,7 +67,7 @@ namespace ClientManagement.Controllers
                 ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
             }
 
-            return Ok("Creation Client terminée avec success");
+            return Ok();
         }
 
 
@@ -90,41 +90,46 @@ namespace ClientManagement.Controllers
                 ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
             }
 
-            return Ok("Creation Client terminée avec success");
+            return Ok(client);
         }
 
-        //UpdateClient_with_is
+        //UpdateClient_with_id
         [HttpPut("{id}")]
-        public ActionResult UpdateCient_with_id(int id, [FromBody] Client client = null)
+        public ActionResult UpdateCient_with_id(int id, [FromBody] Client client)
         {
+            /*
+            ContextC.Entry(client).State = EntityState.Modified;
+            
+            ContextC.SaveChanges();
 
+            return Ok();
 
-            var client1 = ContextC.Client.Find(id);
-            if (client1 != null)
-            {
-                ContextC.Entry<Client>(client1).State = EntityState.Detached;
-                try
-                {
+            */
+                        var client1 = ContextC.Client.Find(id);
 
-                    if (ModelState.IsValid)
-                    {
-                        Console.WriteLine("--> client: -", client.Nom, " ", client.Prenom, "- is being Modified ");
-                        ContextC.Entry<Client>(client).State = EntityState.Detached;
-                        ContextC.Update(client);
+                        if (client1 != null)
+                        {
+                            ContextC.Entry<Client>(client1).State = EntityState.Detached;
+                            try
+                            {
 
-
-
-                        ContextC.SaveChanges();
-                    }
-                }
-                catch (DataException /* dex */)
-                {
-                    ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
-                }
-
-            }
-            return Ok("Creation Client terminée avec success");
-        }
+                                if (ModelState.IsValid)
+                                {
+                                  //  Console.WriteLine("--> client: -", client.Nom, " ", client.Prenom, "- is being Modified ");
+                                   // ContextC.Entry<Client>(client).State = EntityState.Detached;
+                                    ContextC.Entry(client).State = EntityState.Modified;
+                                    
+                                    ContextC.SaveChanges();
+                                }
+                            }
+                            catch (DataException)
+                            {
+                                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
+                            }
+                            return Ok(client);
+                        }
+                        return NotFound();
+                     }
 
 
         [HttpDelete]
@@ -135,8 +140,7 @@ namespace ClientManagement.Controllers
                 Console.WriteLine("--> client: -", client.Nom, " ", client.Prenom, "- is being Deleted ");
                 ContextC.Remove(client);
                 ContextC.SaveChanges();
-                return Ok(" Client Supprimé avec Success ");
-
+                return Ok("{\"message\":\"client Supprimé avec Success\"}");
             }
             catch ( Exception e)
             {
@@ -144,7 +148,7 @@ namespace ClientManagement.Controllers
                 return Ok(errorstring); }
 
         }
-
+        //Delete_with_id
         [HttpDelete("{id}")]
         public ActionResult DeleteClient_with_id(int id)
         {
@@ -161,7 +165,7 @@ namespace ClientManagement.Controllers
                     ContextC.Entry<Client>(client1).State = EntityState.Detached;
                     ContextC.Remove(client);
                     ContextC.SaveChanges();
-                    return Ok(" Client Supprimé avec Success ");
+                    return Ok("{\"message\":\"client Supprimé avec Success\"}");
 
                 }
                 catch (Exception e)

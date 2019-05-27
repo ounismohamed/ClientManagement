@@ -8,10 +8,10 @@ namespace AppData.Models
     {
         public Client() {
 
-            Random random = new Random();
-            id =  random.Next(1000);
-            Sexe = 'F';
-            Etat_Civil = "M";
+         //   Random random = new Random();
+           // id =  random.Next(1000);
+            //Sexe = 'F';
+           // Etat_Civil = "M";
             //Carte_Fidelite = true;
             //Carte_Credit = false;
 
